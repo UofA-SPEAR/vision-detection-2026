@@ -1,0 +1,16 @@
+# Core deep learning dependencies
+ultralytics==8.3.40
+torch>=2.2.0
+torchvision>=0.17.0
+
+# Image & video processing
+opencv-python>=4.10.0
+numpy>=1.26.0
+
+# Data utilities
+pandas>=2.2.0
+PyYAML>=6.0.1
+gdown>=5.1.0
+
+# Optional for GStreamer video capture (Linux/rover)
+gi
