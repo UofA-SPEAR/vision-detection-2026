@@ -1,9 +1,9 @@
 # vision-detection-2026
 
 
-## Start virtual environment:
+## install requirements(I recommend using a virtual environment):
 ```
-vision_env\Scripts\activate
+pip install -r requirements.txt
 ```
 
 ## Test the pretrained yolo model using your laptop webcam:
