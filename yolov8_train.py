@@ -10,7 +10,7 @@ def main():
         imgsz=640,             
         batch=8,               
         name='rover_detection', 
-        device=0               
+        device=1               
     )
 
 if __name__ == "__main__":
