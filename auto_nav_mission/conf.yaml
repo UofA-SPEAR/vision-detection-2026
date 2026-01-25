@@ -1,0 +1,8 @@
+path: dataset
+train: train/images
+val: val/images
+
+names:
+  0: waterbottle
+  1: mallet
+  2: hammer
