@@ -62,54 +62,84 @@ def aruco_display(corners, ids, rejected, image):
 		
 		return image
 
+
+
+def pose_estimation(frame, aruco_dict_type, matrix_coefficients, distortion_coefficients):
+	gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+	aruco_dict = cv2.aruco.getPredefinedDictionary(aruco_dict_type)
+	parameters = cv2.aruco.DetectorParameters()
+	detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+
+	corners, ids, rejected_img_points = detector.detectMarkers(gray)
+
+        
+	if len(corners) > 0:
+		for i in range(0, len(ids)):
+			rvec, tvec, markerPoints = cv2.aruco.estimatePoseSingleMarkers(corners[i], 0.02, matrix_coefficients,
+                                                                       distortion_coefficients)
+			cv2.aruco.drawDetectedMarkers(frame, corners) 
+
+			cv2.drawFrameAxes(frame, matrix_coefficients, distortion_coefficients, rvec, tvec, 0.01)  
+
+	return frame
+
+
+
 aruco_type = "DICT_5X5_100"
 id = 1
 
 aruco_dict = cv2.aruco.getPredefinedDictionary(ARUCO_DICT[aruco_type])
 arucoParams = cv2.aruco.DetectorParameters()
 
+#not important
 # marker = cv2.aruco.generateImageMarker(aruco_dict, 1, 250)
-
 # marker = cv2.copyMakeBorder(
 #     marker, 50, 50, 50, 50,
 #     cv2.BORDER_CONSTANT, value=255
 # )
 
-# for default camera
-# cap = cv2.VideoCapture(0)
-# cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-# cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
+
+# for default camera
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+#for pose
+intrinsic_camera = np.array(((933.15867, 0, 657.59),(0,933.1586, 400.36993),(0,0,1)))
+distortion = np.array((-0.43948,0.18514,0,0))
+
+#for zed x one
 # zedxonesrc → ZED X One camera driver (GStreamer source)
 # camera-resolution=2 → HD1200 (1920×1200)
 # camera-fps=30 → 30 frames per second
-
-gst_pipeline = (
-    "zedxonesrc camera-resolution=2 camera-fps=30 ! "
-    "videoconvert ! "
-    "appsink drop=1"
-)
-
-cap = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
-
-if not cap.isOpened():
-    raise RuntimeError("Could not open ZED X One camera")
-
-print(cv2.getBuildInformation())
+# gst_pipeline = (
+#     "zedxonesrc camera-resolution=2 camera-fps=30 ! "
+#     "videoconvert ! "
+#     "appsink drop=1"
+# )
+# cap = cv2.VideoCapture(gst_pipeline, cv2.CAP_GSTREAMER)
+# if not cap.isOpened():
+#     raise RuntimeError("Could not open ZED X One camera")
+# print(cv2.getBuildInformation())
 
 while cap.isOpened():
 	ret, img = cap.read()
 
-	h, w, _ = img.shape
+	#For id detection
+	# h, w, _ = img.shape
+	# width = 1000
+	# height = int(width*(h/w))
+	# img = cv2.resize(img, (width, height ), interpolation=cv2.INTER_CUBIC)
+	# corners, ids, rejected = cv2.aruco.detectMarkers(img, aruco_dict, parameters = arucoParams)
+	# detected_markers = aruco_display(corners, ids, rejected, img)
+	#cv2.imshow("Marker", detected_markers)
 
-	width = 1000
-	height = int(width*(h/w))
-	img = cv2.resize(img, (width, height ), interpolation=cv2.INTER_CUBIC)
 
-	corners, ids, rejected = cv2.aruco.detectMarkers(img, aruco_dict, parameters = arucoParams)
-	
-	detected_markers = aruco_display(corners, ids, rejected, img)
-	cv2.imshow("Marker", detected_markers)
+	#for pose estimation
+	output = pose_estimation(img, ARUCO_DICT[aruco_type], intrinsic_camera, distortion)	
+	cv2.imshow('Estimated Pose', output)
+
 
 	key = cv2.waitKey(1) & 0xFF
 	if key == ord("q"):
