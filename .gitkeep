@@ -1,0 +1,6 @@
+touch obj_hammer/images/.gitkeep
+touch obj_hammer/labels/.gitkeep
+touch obj_mallet/images/.gitkeep
+touch obj_mallet/labels/.gitkeep
+touch obj_waterbottle/images/.gitkeep
+touch obj_waterbottle/labels/.gitkeep
